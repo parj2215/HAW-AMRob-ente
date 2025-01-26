@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  ros2_ws:
+    build: .
+    network_mode: host
+    ipc: host
+    volumes:
+      - /home/ente/final/final_ros2_ws:/ros2_ws
+      - /tmp/.X11-unix:/tmp/.X11-unix             # Allow X11 socket communication
+    devices:
+      # - /dev/ttyACM0:/dev/ttyACM0                # Arduino
+      - /dev/i2c-1:/dev/i2c-1 
+      - /dev/ttyUSB0:/dev/ttyUSB0                 # Lidar
+    environment:
+      - DISPLAY=:0                                # Forward display environment variable
+      - QT_X11_NO_MITSHM=1                        # Fix shared memory issue for Qt apps
+    privileged: true                              # Allow full access to devices
+    tty: true                                     # Ensure TTY is enabled for interactive use
