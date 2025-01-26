@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>drive</name>
+  <version>0.0.1</version>
+  <description>A ROS2 package for drive functionality with FSM.</description>
+
+  <maintainer email="your_email@example.com">Your Name</maintainer>
+  <license>Apache-2.0</license>
+
+  <!-- Build system dependencies -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <!-- Runtime dependencies -->
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+
+  <!-- Test dependencies -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <!-- Export information -->
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
