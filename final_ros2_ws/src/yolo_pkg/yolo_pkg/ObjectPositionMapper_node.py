@@ -21,7 +21,6 @@ class ObjectMarkerNode(Node):
         # Marker publisher to RViz
         self.marker_publisher = self.create_publisher(Marker, '/object_marker', 10)
 
-        # TF2 buffer and listener for transformations
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
 
@@ -29,21 +28,17 @@ class ObjectMarkerNode(Node):
 
     def object_callback(self, msg):
         try:
-            # Lookup transform from camera frame to map frame
             transform = self.tf_buffer.lookup_transform(
                 'map',  # Target frame
                 msg.header.frame_id,  # Source frame (e.g., camera_link)
                 rclpy.time.Time()  # Use latest available transform
             )
 
-            # Transform the detected object's position to the map frame
             transformed_point = do_transform_point(PointStamped(header=msg.header, point=msg.pose.position), transform)
 
-            # Log the transformed position
             position = transformed_point.point
             self.get_logger().info(f"Object in map frame: x={position.x}, y={position.y}, z={position.z}")
 
-            # Publish a marker for the object
             self.publish_marker(position)
 
         except Exception as e:
@@ -58,29 +53,24 @@ class ObjectMarkerNode(Node):
         marker.type = Marker.SPHERE  # Shape of the marker
         marker.action = Marker.ADD
 
-        # Set the position of the marker
         marker.pose.position.x = position.x
         marker.pose.position.y = position.y
         marker.pose.position.z = position.z
 
-        # Set the orientation (no rotation)
         marker.pose.orientation.x = 0.0
         marker.pose.orientation.y = 0.0
         marker.pose.orientation.z = 0.0
         marker.pose.orientation.w = 1.0
 
-        # Set the scale (size) of the marker
         marker.scale.x = 0.2  # Diameter in x
         marker.scale.y = 0.2  # Diameter in y
         marker.scale.z = 0.2  # Diameter in z
 
-        # Set the color of the marker (red, with full opacity)
         marker.color.r = 1.0
         marker.color.g = 0.0
         marker.color.b = 0.0
         marker.color.a = 1.0
 
-        # Publish the marker
         self.marker_publisher.publish(marker)
 
 

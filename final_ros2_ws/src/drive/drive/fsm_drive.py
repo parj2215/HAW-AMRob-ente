@@ -27,7 +27,6 @@ class SelfNavigationFSM(Node):
     def __init__(self):
         super().__init__('self_navigation_fsm')
 
-        # Parameters
         self.distance_to_wall_threshold = 1.0  # meters
         self.forward_distance = 2.5           # meters
         self.collision_threshold = 1.0        # meters
@@ -38,11 +37,9 @@ class SelfNavigationFSM(Node):
         self.serial_port = '/dev/ttyACM0'
         self.baud_rate = 9600
 
-        # Serial connection to Arduino
         self.arduino = serial.Serial(self.serial_port, self.baud_rate, timeout=1)
         time.sleep(2)  # Wait for the serial connection to initialize
 
-        # State variables
         self.current_state = States.START
         self.wall_side = None  # 'left' or 'right'
         self.turns_completed = 0
@@ -55,7 +52,6 @@ class SelfNavigationFSM(Node):
         self.yolo_sub = self.create_subscription(Bool, '/object_detected', self.yolo_callback, 10)
 
 
-        # Movement commands
         self.stop_robot()
 
     def send_command(self, pwm_dcmotor, angle_servo):
@@ -75,7 +71,6 @@ class SelfNavigationFSM(Node):
             self.current_state = States.RETURN_TO_START
 
     def lidar_callback(self, msg):
-        # Process Lidar data
         ranges = msg.ranges
         front_distance = min(ranges[0:10] + ranges[-10:])  # Front section of Lidar
         left_distance = min(ranges[80:100])
@@ -83,25 +78,13 @@ class SelfNavigationFSM(Node):
         front_left = min(ranges[20:40])  # Front-left sector
         front_right = min(ranges[320:340])  # Front-right sector
 
-        # Check for obstacles
         if front_distance < self.collision_threshold:
             self.current_state = States.AVOID_COLLISION
 
-        # FSM transitions
         if self.current_state == States.START:
             self.current_state = States.ALIGN_TO_WALL
 
         elif self.current_state == States.ALIGN_TO_WALL:
-            # Determine angle correction
-            # if abs(front_left - front_right) > 0.1:  # Threshold to decide if correction is needed
-            #     if front_left > front_right:
-            #         self.send_command(self.exploration_speed, 120)  # Turn right
-            #     else:
-            #         self.send_command(self.exploration_speed, 60)  # Turn left
-            #     time.sleep(0.5)  # Adjust time based on angular correction speed
-            #     self.send_command(self.exploration_speed, 90)  # Center the servo
-            # else:
-            #     self.current_state = States.MOVE_TOWARD_WALL
 
             self.send_command(self.exploration_speed, 120)  # Turn left
             time.sleep(0.5)  # Adjust time based on angular correction speed
